@@ -1,49 +1,72 @@
 <!DOCTYPE html>
 <!-- By Mohammad Usman Asegaf -->
 <!-- Beberapa kelemahannya adalah butuh kamera dengan resolusi tinggi -->
-<!-- Tetapi HP Modern rata rata sudah bisa -->
+<!-- Tetapi HP Modern rata-rata sudah bisa -->
 <!-- Dan Harus memiliki Background putih disetiap AR marker nya -->
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name = "viewport" content="width=device-width", initial-scale="1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>ARJS Marker</title>
         <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.0/dist/aframe-extras.min.js"></script>
         <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     </head>
     <body style="margin: 0px; overflow: hidden;">
-        <a-scene embedded arjs = "detectionMode:mono_and_matrix;matrixCodeType:3x3">
-
+        <a-scene embedded arjs="detectionMode:mono_and_matrix;matrixCodeType:3x3">
+            <!-- Marker 1 -->
             <a-marker type="barcode" value="0">
-                <a-box color="#a83232" material="opacity:0.5" scale="0.5 0.5 0.5" 
-                animation__putar = "property:rotation; from:0 0 0; to:0 360 0; startEvents:mouseenter"></a-box>
+                <a-entity 
+                    gltf-model="assets/pokemon_arena.glb" 
+                    scale="12 12 12"
+                    rotation="0 0 0"
+                    >
+                </a-entity>
             </a-marker>
-            
+
+            <!-- Marker 2 -->
             <a-marker type="barcode" value="1">
-                <a-box color="#ffff00" material="opacity:0.5" scale="0.5 0.5 0.5" 
-                animation__putar = "property:rotation; from:0 0 0; to:0 360 0; startEvents:mouseenter"></a-box>
+                <a-entity 
+                    gltf-model="assets/pokemon_players_room.glb" 
+                    scale="0.25 0.25 0.25" 
+                    rotation="-90 0 0"
+                    >
+                </a-entity>
             </a-marker>
-            
+
+            <!-- Marker 3 -->
             <a-marker type="barcode" value="2">
-                <a-box color="#a84e32" material="opacity:0.5" scale="0.5 0.5 0.5" 
-                animation__putar = "property:rotation; from:0 0 0; to:0 360 0; startEvents:mouseenter"></a-box>
+                <a-entity 
+                    gltf-model="assets/pokemon_pokecenter.glb" 
+                    scale="1 1 1" 
+                    rotation="-90 0 0"
+                    >
+                </a-entity>
             </a-marker>
 
+            <!-- Marker 4 -->
             <a-marker type="barcode" value="3">
-                <a-box color="#a87932" material="opacity:0.5" scale="0.5 0.5 0.5" 
-                animation__putar = "property:rotation; from:0 0 0; to:0 360 0; startEvents:mouseenter"></a-box>
+                <a-entity 
+                    gltf-model="assets/pokemon_pokemart.glb" 
+                    scale="0.3 0.3 0.3" 
+                    rotation="-90 0 0"
+                    >
+                </a-entity>
             </a-marker>
 
+            <!-- Marker 5 -->
             <a-marker type="barcode" value="4">
-                <a-box color="#32a87d" material="opacity:0.5" scale="0.5 0.5 0.5" 
-                animation__putar = "property:rotation; from:0 0 0; to:0 360 0; startEvents:mouseenter"></a-box>
+                <a-entity 
+                    gltf-model="assets/pokemon_sisters_bedroom.glb" 
+                    scale="0.3 0.3 0.3" 
+                    rotation="-90 0 0"
+                    >
+                </a-entity>
             </a-marker>
 
-
+            <!-- Kamera dengan kursor -->
             <a-entity camera>
-                <a-cursor>
-                </a-cursor>
+                <a-cursor></a-cursor>
             </a-entity>
         </a-scene>
     </body>
