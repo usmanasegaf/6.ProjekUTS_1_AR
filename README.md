@@ -1,5 +1,5 @@
 # Projek UTS ARVR Bagian AR
-### Tema: Rooms
+### Tema: 3d Rooms
 
 #### Dibuat oleh Mohammad Usman Asegaf
 
