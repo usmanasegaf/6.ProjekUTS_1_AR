@@ -1,74 +1,140 @@
 <!DOCTYPE html>
-<!-- By Mohammad Usman Asegaf -->
-<!-- Beberapa kelemahannya adalah butuh kamera dengan resolusi tinggi -->
-<!-- Tetapi HP Modern rata-rata sudah bisa -->
-<!-- Dan Harus memiliki Background putih disetiap AR marker nya -->
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ARJS Marker</title>
-        <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.0/dist/aframe-extras.min.js"></script>
-        <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    </head>
-    <body style="margin: 0px; overflow: hidden;">
-        <a-scene embedded arjs="detectionMode:mono_and_matrix;matrixCodeType:3x3">
-            <!-- Marker 1 -->
-            <a-marker type="barcode" value="0">
-                <a-entity 
-                    gltf-model="assets/pokemon_arena.glb" 
-                    scale="15 15 15"
-                    rotation="0 0 0"
-                    animation="property: rotation; to: 0 360 0; startEvents:loaded; dur: 8000; loop:true"
-                    >
-                </a-entity>
-            </a-marker>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARJS Marker Enhanced</title>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.0/dist/aframe-extras.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script>
+        AFRAME.registerComponent('hover-scale', {
+            schema: { scale: { default: 1.05 } },
+            init: function () {
+                let el = this.el;
+                let originalScale = el.getAttribute('scale');
+                el.addEventListener('mouseenter', () => {
+                    el.setAttribute('scale', { x: originalScale.x * this.data.scale, y: originalScale.y * this.data.scale, z: originalScale.z * this.data.scale });
+                });
+                el.addEventListener('mouseleave', () => {
+                    el.setAttribute('scale', originalScale);
+                });
+            }
+        });
 
-            <!-- Marker 2 -->
-            <a-marker type="barcode" value="1">
-                <a-entity 
-                    gltf-model="assets/pokemon_players_room.glb" 
-                    scale="0.4 0.4 0.4" 
-                    rotation="-90 0 0"
-                    >
-                </a-entity>
-            </a-marker>
+        AFRAME.registerComponent('marker-sound', {
+            schema: { src: { type: 'string' } },
+            init: function () {
+                let el = this.el;
+                let sound = document.createElement('audio');
+                sound.src = this.data.src;
+                sound.preload = 'auto';
+                sound.loop = false;
+                this.sound = sound;
+                el.addEventListener('markerFound', () => { this.sound.play(); });
+                el.addEventListener('markerLost', () => { this.sound.pause(); });
+            }
+        });
 
-            <!-- Marker 3 -->
-            <a-marker type="barcode" value="2">
-                <a-entity 
-                    gltf-model="assets/pokemon_pokecenter.glb" 
-                    scale="1.8 1.8 1.8" 
-                    rotation="-90 0 0"
-                    >
-                </a-entity>
-            </a-marker>
+        AFRAME.registerComponent('drag-rotate', {
+            init: function () {
+                let el = this.el;
+                let isDragging = false;
+                let previousX = 0, previousY = 0;
 
-            <!-- Marker 4 -->
-            <a-marker type="barcode" value="3">
-                <a-entity 
-                    gltf-model="assets/pokemon_pokemart.glb" 
-                    scale="0.4 0.4 0.4" 
-                    rotation="-90 0 0"
-                    >
-                </a-entity>
-            </a-marker>
+                el.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    previousX = e.clientX;
+                    previousY = e.clientY;
+                });
 
-            <!-- Marker 5 -->
-            <a-marker type="barcode" value="4">
-                <a-entity 
-                    gltf-model="assets/pokemon_sisters_bedroom.glb" 
-                    scale="0.3 0.3 0.3" 
-                    rotation="-90 0 0"
-                    >
-                </a-entity>
-            </a-marker>
+                el.addEventListener('touchstart', (e) => {
+                    isDragging = true;
+                    previousX = e.touches[0].clientX;
+                    previousY = e.touches[0].clientY;
+                });
 
-            <!-- Kamera dengan kursor -->
-            <a-entity camera>
-                <a-cursor></a-cursor>
-            </a-entity>
-        </a-scene>
-    </body>
+                window.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    let dx = e.clientX - previousX;
+                    let dy = e.clientY - previousY;
+                    let rotation = el.getAttribute('rotation');
+                    el.setAttribute('rotation', { x: rotation.x + dy * 0.1, y: rotation.y + dx * 0.1, z: rotation.z });
+                    previousX = e.clientX;
+                    previousY = e.clientY;
+                });
+
+                window.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    let dx = e.touches[0].clientX - previousX;
+                    let dy = e.touches[0].clientY - previousY;
+                    let rotation = el.getAttribute('rotation');
+                    el.setAttribute('rotation', { x: rotation.x + dy * 0.1, y: rotation.y + dx * 0.1, z: rotation.z });
+                    previousX = e.touches[0].clientX;
+                    previousY = e.touches[0].clientY;
+                });
+
+                window.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+
+                window.addEventListener('touchend', () => {
+                    isDragging = false;
+                });
+            }
+        });
+
+        AFRAME.registerComponent('click-animation', {
+            schema: { animation: { type: 'string' } },
+            init: function () {
+                let el = this.el;
+                el.addEventListener('click', () => {
+                    el.setAttribute('animation', this.data.animation);
+                });
+            }
+        });
+    </script>
+</head>
+<body style="margin: 0px; overflow: hidden;">
+    <a-scene embedded arjs="detectionMode: mono_and_matrix; matrixCodeType: 3x3">
+        <a-light type="directional" position="0 5 5" intensity="1.5"></a-light>
+
+        <!-- Marker 1 -->
+        <a-marker type="barcode" value="0" marker-sound="src: assets/sound1.mp3">
+            <a-entity gltf-model="assets/pokemon_arena.glb" scale="15 15 15" rotation="0 0 0"
+                      animation="property: rotation; to: 0 360 0; startEvents: loaded; dur: 8000; loop: true"
+                      hover-scale drag-rotate click-animation="animation: property: scale; to: 20 20 20; dur: 500; easing: easeInOutQuad"></a-entity>
+            <a-text value="Arena" position="0 3 0" anchor="center" color="white"></a-text>
+        </a-marker>
+
+        <!-- Marker 2 -->
+        <a-marker type="barcode" value="1" marker-sound="src: assets/sound2.mp3">
+            <a-entity gltf-model="assets/pokemon_players_room.glb" scale="0.4 0.4 0.4" rotation="-90 0 0" hover-scale drag-rotate click-animation="animation: property: scale; to: 0.6 0.6 0.6; dur: 500; easing: easeInOutQuad"></a-entity>
+            <a-text value="Player's Room" position="0 2 0" anchor="center" color="white"></a-text>
+        </a-marker>
+
+        <!-- Marker 3 -->
+        <a-marker type="barcode" value="2" marker-sound="src: assets/sound3.mp3">
+            <a-entity gltf-model="assets/pokemon_pokecenter.glb" scale="1.8 1.8 1.8" rotation="-90 0 0" hover-scale drag-rotate click-animation="animation: property: scale; to: 2.2 2.2 2.2; dur: 500; easing: easeInOutQuad"></a-entity>
+            <a-text value="PokeCenter" position="0 2 0" anchor="center" color="white"></a-text>
+        </a-marker>
+
+        <!-- Marker 4 -->
+        <a-marker type="barcode" value="3" marker-sound="src: assets/sound4.mp3">
+            <a-entity gltf-model="assets/pokemon_pokemart.glb" scale="0.4 0.4 0.4" rotation="-90 0 0" hover-scale drag-rotate click-animation="animation: property: scale; to: 0.6 0.6 0.6; dur: 500; easing: easeInOutQuad"></a-entity>
+            <a-text value="PokeMart" position="0 2 0" anchor="center" color="white"></a-text>
+        </a-marker>
+
+        <!-- Marker 5 -->
+        <a-marker type="barcode" value="4" marker-sound="src: assets/sound5.mp3">
+            <a-entity gltf-model="assets/pokemon_sisters_bedroom.glb" scale="0.3 0.3 0.3" rotation="-90 0 0" hover-scale drag-rotate click-animation="animation: property: scale; to: 0.5 0.5 0.5; dur: 500; easing: easeInOutQuad"></a-entity>
+            <a-text value="Sister's Bedroom" position="0 2 0" anchor="center" color="white"></a-text>
+        </a-marker>
+
+        <!-- Kamera dengan kursor -->
+        <a-entity camera>
+            <a-cursor></a-cursor>
+        </a-entity>
+    </a-scene>
+</body>
 </html>
